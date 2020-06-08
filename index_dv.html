@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Atelier 2.4 Luc - vue app REST API</title>
+        <!-- -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+        crossorigin="anonymous">
+        <!-- -->
+        <style>
+        @import url(https://fonts.googleapis.com/css?family=Cookie);
+
+        /* Hide un-compiled mustache bindings
+        until the Vue instance is ready */
+        [v-cloak] {   display: none;
+        }
+
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <div id="corpsAPI">
+
+            <!-- <h2>colleges</h2> 
+                <pre v-if="apiLoaded">{{colleges[0]}}</pre> 
+            <p>---</p> -->
+
+            <h1>COLLEGES de LOIRE-ATLANTIQUE</h1>
+                <template v-for="branch in branches">
+                    <!-- DV : tu pourrais utiliser des noms plus adaptés que branch, etc. -->
+                    <input type="radio"
+                    :id="branch"
+                    :value="branch"
+                    name="branch"
+                    v-model="currentBranch">
+                    <label :for="branch">{{ branch }}</label>
+                </template>
+                <p>Type de Collèges <strong>{{ currentBranch }} </strong></p>
+
+            -->
+            <p>----------</p>
+            <!-- utilisation des données réponses de l'API à partir de college.fields -->
+            <table class = "table table-striped table-responsive-sm" v-bind:class="classTable">
+                <!-- DV : Problème de responsive... Avec les tableaux, c'est classique. Bon, de toute façon, un peu de travail sur la mise en page serait sympa. " -->
+                <thead class = "thead-light">
+                    <tr>
+                        <th>Nom étb</th>
+                        <th>Ville</th>
+                        <th>Longitude</th>
+                        <th>Latitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="apiLoaded" v-for="college in colleges">
+                        <td>{{college.fields.etab_scolaire_nom}}</td>
+                        <td>{{college.fields.acheminement}} </td>
+                        <td>{{college.fields.longitude }}</td>
+                        <td>{{college.fields.latitude }}</td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+            <!-- fin utilisation des données -->
+        </div>
+
+
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            
+            var apiURLpublic = "https://data.loire-atlantique.fr/api/records/1.0/search/?dataset=224400028_colleges-publics-en-loire-atlantique&q=&sort=etab_scolaire_uai&facet=acheminement";
+            var apiURLprive = "https://data.loire-atlantique.fr/api/records/1.0/search/?dataset=224400028_colleges-prives-en-loire-atlantique&q=&sort=etab_scolaire_uai&facet=acheminement";
+
+            var vueAPI = new Vue({
+                el: '#corpsAPI',
+
+                data: {
+                    branches: ['public', 'prive'],
+		            currentBranch: 'public',
+                    colleges: null,
+                    apiLoaded: false
+                },
+
+                created: function () {
+                    this.fetchData()
+                },
+
+                watch: {
+                    currentBranch: 'fetchData'
+                },
+
+                computed: {
+                    classTable: function () {
+                        var classeT = "";
+                        // DV : c'est bien la classe dynamique.
+                        if (this.currentBranch == 'public') {
+                            classeT = 'table-primary';
+                        } else {
+                            classeT = 'table-warning';
+                        };
+                        return classeT
+                    }
+
+                },
+
+                methods: {
+                    fetchData: function () {
+                        var apiURL = "";
+                        var self = this;
+                        if (self.currentBranch == "public") {
+                            apiURL = apiURLpublic;
+                        } else {
+                            apiURL = apiURLprive;
+                        };
+    
+                        axios.get(apiURL)
+                        .then(function (response) {
+                            console.log(response.data.records)
+                            self.colleges = response.data.records
+                            self.apiLoaded = true
+
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+
+                    }   
+
+                }
+
+            });
+
+        </script>
+
+    </body>
+</html>
