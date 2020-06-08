@@ -5,7 +5,11 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Atelier 2.4 Luc - vue app REST API</title>
-
+        <!-- -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
+        crossorigin="anonymous">
+        <!-- -->
         <style>
         @import url(https://fonts.googleapis.com/css?family=Cookie);
 
@@ -23,8 +27,8 @@
 
         <div id="corpsAPI">
 
-            <!-- <h2>colleges</h2>
-                <pre>{{colleges}}</pre> 
+            <!-- <h2>colleges</h2> 
+                <pre v-if="apiLoaded">{{colleges[0]}}</pre> 
             <p>---</p> -->
 
             <h1>COLLEGES de LOIRE-ATLANTIQUE</h1>
@@ -40,16 +44,26 @@
 
             -->
             <p>----------</p>
-            <!-- utilisation des données réponses de l'API à partir de self.fields -->
-            <ul>
-                <li v-if="apiLoaded" v-for="college in colleges">
+            <!-- utilisation des données réponses de l'API à partir de college.fields -->
+            <table class = "table table-responsive-sm">
+                <thead class = "thead-light">
+                    <tr>
+                        <th>Nom étb</th>
+                        <th>Ville</th>
+                        <th>Longitude</th>
+                        <th>Latitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-if="apiLoaded" v-for="college in colleges">
+                        <td>{{college.fields.etab_scolaire_nom}}</td>
+                        <td>{{college.fields.acheminement}} </td>
+                        <td>{{college.fields.longitude }}</td>
+                        <td>{{college.fields.latitude }}</td>
+                    </tr>
+                </tbody>
 
-                    {{college.fields.etab_scolaire_nom}} - {{college.fields.acheminement}}
-
-                </li>
-
-
-            </ul>
+            </table>
 
             <!-- fin utilisation des données -->
         </div>
