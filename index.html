@@ -40,20 +40,12 @@
 
             -->
             <p>----------</p>
-            <!-- utilisation des données réponses de l'API à partir de self.commits -->
+            <!-- utilisation des données réponses de l'API à partir de self.fields -->
             <ul>
-                <li v-for="college in colleges">
+                <li v-if="apiLoaded" v-for="college in colleges">
 
                     {{college.fields.etab_scolaire_nom}} - {{college.fields.acheminement}}
 
-
-
-<!--                
-                    <a :href="record.html_url" target="_blank" class="commit">{{ record.sha.slice(0, 7) }}</a>
-                    - <span class="message">{{ record.commit.message}}</span><br>
-                    by <span class="author"><a :href="record.author.html_url" target="_blank">{{ record.commit.author.name }}</a></span>
-                    at <span class="date">{{ record.commit.author.date}}</span> -->
-                    
                 </li>
 
 
@@ -78,7 +70,8 @@
                 data: {
                     branches: ['public', 'prive'],
 		            currentBranch: 'public',
-                    colleges: null
+                    colleges: null,
+                    apiLoaded: false
                 },
 
                 created: function () {
@@ -107,7 +100,8 @@
                         axios.get(apiURL)
                         .then(function (response) {
                             console.log(response.data.records)
-                            self.colleges = response.data.records 
+                            self.colleges = response.data.records
+                            self.apiLoaded = true
 
                         })
                         .catch(function (error) {
