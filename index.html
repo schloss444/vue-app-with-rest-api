@@ -56,7 +56,7 @@
             <div class="row">
             <!-- utilisation des données réponses de l'API à partir de college.fields -->
 
-                <div v-if="apiLoaded" v-for="college in colleges" class="card col-sm-6 col-md-4 col-lg-3 mx-1 my-1" v-bind:class="classTable" >
+                <div v-if="apiLoaded" v-for="college in colleges" class="card col-sm-6 col-md-4 col-lg-3 mx-1 my-1" v-bind:class="classTable(college)" >
                     <div class="card-header bg-light">
                         <p>Ville de {{college.fields.acheminement}}</p>
                         <p>({{college.fields.code_postal}})</p>
@@ -108,15 +108,7 @@
                 },
 
                 computed: {
-                    classTable: function () {
-                        var classeT = "";
-                        if (this.currentBranch == 'public') {
-                            classeT = 'bg-info';
-                        } else {
-                            classeT = 'bg-warning';
-                        };
-                        return classeT
-                    }
+
 
                 },
 
@@ -142,7 +134,17 @@
                         })
                         // .finally( () => ...)
 
-                    }   
+                    },
+
+                    classTable: function (college) {
+                        var classeT = "";
+                        if (college.fields.etab_scolaire_public == 'public') {
+                            classeT = 'bg-info';
+                        } else {
+                            classeT = 'bg-warning';
+                        };
+                        return classeT
+                    }  
 
                 }
 
