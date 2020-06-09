@@ -40,7 +40,7 @@
                 </div>
 
                 <div>
-                    <input type="text" v-model="searchString" placeholder="Enter your search terms" />
+                    <input type="text" v-model="searchString" placeholder="caractères recherchés ..." class="bg-light">
                     <p>----------</p> 
                 </div>
 
@@ -51,7 +51,8 @@
                         :value="branch"
                         name="branch"
                         v-model="currentBranch">
-                        <label :for="branch">{{ branch }}</label>
+                        <label :for="branch">{{ branch }} </label>
+                        <em style = "color: lightgray"> ..... </em>
                     </template>                    
                 </div>
 
@@ -115,7 +116,7 @@
                 },
 
                 watch: {
-                    currentBranch: 'fetchData'
+                    // currentBranch: 'fetchData'
                     
                 },
 
