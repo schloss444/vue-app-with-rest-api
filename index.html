@@ -6,9 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Atelier 2.4 Luc - vue app REST API</title>
         <!-- -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" 
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" 
-        crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
         <!-- -->
         <style>
         @import url(https://fonts.googleapis.com/css?family=Cookie);
@@ -25,52 +26,62 @@
 
     <body>
 
-        <div id="corpsAPI">
-
-            <!-- <h2>colleges</h2> 
+        <div id="corpsAPI" class="container">
+            
+            
                 <pre v-if="apiLoaded">{{colleges[0]}}</pre> 
-            <p>---</p> -->
 
-            <h1>COLLEGES de LOIRE-ATLANTIQUE</h1>
-                <template v-for="branch in branches">
-                    <input type="radio"
-                    :id="branch"
-                    :value="branch"
-                    name="branch"
-                    v-model="currentBranch">
-                    <label :for="branch">{{ branch }}</label>
-                </template>
-                <p>Type de Collèges <strong>{{ currentBranch }} </strong></p>
 
-            -->
-            <p>----------</p>
+
+            <div>
+                <div>
+                    <h1>COLLEGES de LOIRE-ATLANTIQUE</h1>
+                </div>
+                <div>
+                    <template v-for="branch in branches">
+                        <input type="radio"
+                        :id="branch"
+                        :value="branch"
+                        name="branch"
+                        v-model="currentBranch">
+                        <label :for="branch">{{ branch }}</label>
+                    </template>                    
+                </div>
+                <div v-bind:class="classTable">
+                    <p>Type de Collèges <strong>{{ currentBranch }} </strong></p>      
+                </div>
+                <p>----------</p>
+            </div>
+
+            <div class="row">
             <!-- utilisation des données réponses de l'API à partir de college.fields -->
-            <table class = "table table-striped table-responsive-sm" v-bind:class="classTable">
-                <thead class = "thead-light">
-                    <tr>
-                        <th>Nom étb</th>
-                        <th>Ville</th>
-                        <th>Longitude</th>
-                        <th>Latitude</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="apiLoaded" v-for="college in colleges">
-                        <td>{{college.fields.etab_scolaire_nom}}</td>
-                        <td>{{college.fields.acheminement}} </td>
-                        <td>{{college.fields.longitude }}</td>
-                        <td>{{college.fields.latitude }}</td>
-                    </tr>
-                </tbody>
 
-            </table>
+                <div v-if="apiLoaded" v-for="college in colleges" class="card col-sm-6 col-md-4 col-lg-3 mx-1 my-1" v-bind:class="classTable" >
+                    <div class="card-header bg-light">
+                        <p>Ville de {{college.fields.acheminement}}</p>
+                        <p>({{college.fields.code_postal}})</p>
+                    </div>
+                    <div class="card-body">
+                        <mark>{{college.fields.etab_scolaire_nom}}</mark>
+                        <p>Etb {{college.fields.etab_scolaire_public}} ({{college.fields.etab_scolaire_uai}})</p>
+                        <p>Adr : {{college.fields.serv_spec }}</p>
+                        <p>{{college.fields.numero}}  {{college.fields.libelle}} {{college.fields.nom_voie}}</p>
+
+
+                    </div> 
+                    <div class="card-footer bg-secondary text-white">
+                        <!-- ?? ici faire appel API pour récupérer et intégrer carte correspondante à ces coordonnées ??-->
+                        <p>Longitude : {{college.fields.longitude }}</p>
+                        <p>Latitude : {{college.fields.latitude }}</p>
+                    </div>
+                </div>
 
             <!-- fin utilisation des données -->
+            </div>
         </div>
 
 
-
-
+        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script>
@@ -100,9 +111,9 @@
                     classTable: function () {
                         var classeT = "";
                         if (this.currentBranch == 'public') {
-                            classeT = 'table-primary';
+                            classeT = 'bg-info';
                         } else {
-                            classeT = 'table-warning';
+                            classeT = 'bg-warning';
                         };
                         return classeT
                     }
@@ -129,6 +140,7 @@
                         .catch(function (error) {
                             console.log(error);
                         })
+                        // .finally( () => ...)
 
                     }   
 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Alerte Pollen Nantes Métropole</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+        <!-- Feuille de style -->
+        <style>
+            .yellow{
+                background-color: yellow;
+            }
+            .green{
+                background-color: greenyellow;
+            }
+            .orange{
+                background-color: orange;
+            }
+            .red{
+                background-color: red;
+            }
+            #recherche{
+                margin-left: 10%;
+                margin-top: 5%;
+            }
+            h1{
+                text-align: center;
+            }
+            #container {
+                border: solid 1px black;
+            }
+            #listeComplete {
+                display: flex; 
+                /*margin-right: 10%; 
+                margin-top: -150%;
+                margin-left: 10%;*/                
+            }
+            
+
+        </style>
+    </head>
+
+    <body>
+        
+
+        <div class="container-flex" id="main" >
+            <div class="row">
+                <div class="col-md-12" id="titre">
+                    <h1>  Alerte pollen  </h1>
+                    <h1> Nantes métropole</h1>     
+                </div>
+            </div>
+            <div class="row text-left">
+                <div class="col-md-12" id="recherche">
+                    <label>
+                        Nom : 
+                        <select v-model="nom">
+                            <option v-for=" e in liste" :value="e">{{e}}</option>
+                        </select>  
+                    </label>
+<br>
+                    <!-- <button > Voir les graminées</button> 
+                    <button v-on:click="displayAll()"> Voir tout </button>-->
+                </div>
+            </div>
+
+<!-- EN FONCTION DU NOM CHERCHÉ -->
+            <!-- <div class="row" id="listeNom" style="background-color: color" v-for="i in response" class="infos" > 
+                <div class="col-sm-12" id=container v-if="i.fields.nom === nom" >
+                    Nom : {{i.fields.nom}} <br>
+                    Type : {{i.fields.sous_type}} <br>
+                    Etat : {{i.fields.etat}} <br>
+                </div>
+            </div>   -->
+
+<!-- EN FONCTION DU NOM CHERCHÉ 
+             <div class="row" id="listeType" v-for="i in response" class="infos" > 
+                <div class="col-md-6 col-lg-4 mx-2" id=containerNom v-if="i.fields.nom === nom" >
+                    Nom : {{i.fields.nom}} <br>
+                    Type : {{i.fields.sous_type}} <br>
+                    Etat : {{i.fields.etat}} <br>
+                </div>
+            </div>   -->
+
+<!-- TOUS LES RESULTATS -->
+            <div class="row"  id="listeComplete"  class="infos" > 
+                <div class="offset-sm-2 col-sm-6 offset-sm-2 col-md-4 offset-md-3 mx-2 " id="container"  :class="changeBackgroundColor(i.fields.etat)" v-for="i in response" > 
+                    <!-- <pre>{{response}}</pre> -->
+                    Nom : {{i.fields.nom}} <br>                
+                    Etat : {{i.fields.etat}} <br>   
+                    Sous-type : {{i.fields.sous_type}}  <br>
+                    Date : {{i.fields.date}} <br>              
+                </div>
+            </div> 
+
+
+            <!-- <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <p> {{nom}}  {{sousType}}</p>
+                         <pre> Numéro 1 : {{response.records[0].fields}} </pre> 
+                        <pre > Numéro  : {{ response.records }} </pre>
+                        <div v-else>
+                            <div v-for="i in info" class="infos" > 
+                                <div class="col-md-12" id=container>
+                           
+                              Sites : {{i.fields.designation}} <br>
+                              Nature du site : {{i.fields.nature_site}} <br>
+                              Adresse du site : {{i.fields.adresse}} <br>-->
+                                <pre>{{response.records}}</pre>  
+                                <!-- </div>                            
+                          </div>
+                    </div>
+                </div>
+            </div> 
+        </div> -->
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script>
+            ///api/records/1.0/search/?dataset=323266205_alertes-pollens-nantes&q=&facet=nom&facet=type&facet=sous_type&facet=etat&facet=date 
+            
+            var lienURL = "https://data.nantesmetropole.fr/api/records/1.0/search/?dataset=323266205_alertes-pollens-nantes&q=&rows=15&facet=nom&facet=type&facet=sous_type&facet=etat&facet=date "
+            
+            
+            var pollen = new Vue ({
+                el: "#main",
+                data: {  
+                    response: [],
+                    etat: "",
+                    nom: "", 
+                    display: false,
+                    liste : [],
+                    
+                },
+                /*created: function () {
+                    this.fetchData()
+                },*/
+                mounted: function(){
+                    this.fetchData()
+                },
+                
+                methods: {
+                    fetchData: function(){
+                        var self = this;                        
+                        axios
+                        .get(lienURL)
+                        .then(function (response) {
+                            
+                            self.response = response.data.records;
+                            self.display = true;
+                            //self.etat = self.response[i].fields.etat;
+                            //this.etat = self.etat;
+                            self.liste = response.data.records.map(i=> i.fields.nom);
+                            self.liste = [...new Set(self.liste)];
+                        })
+                        .catch(function(error){
+                            console.log("error");
+                        })                        
+                    },
+                    displayAll(){
+                        document.getElementById("listeComplete").style.display = "flex";
+                    },  
+                    changeBackgroundColor(etat) {    
+                            switch (etat) {
+                            case 1:
+                            case 2:
+                            return "green";
+                            break;
+
+                            case 3:
+                            return "yellow";
+                            break;
+
+                            case 4:
+                            case 5:
+                            return "orange";
+                            break;
+
+                            case 6:
+                            case 7:
+                            case 8:
+                            return "orangered";
+                            break;
+
+                            case 9:
+                            case 10:
+                            return "red";
+                            break;
+
+                            default:
+                            return 'white';
+                        }
+                    }
+                }
+            })
+    </script>
+</body>
+
+</html>
