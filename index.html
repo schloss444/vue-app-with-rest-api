@@ -37,7 +37,7 @@
                 <div>
                     <h1>COLLEGES de LOIRE-ATLANTIQUE</h1>
                 </div>
-                <div>
+                <!-- <div>
                     <template v-for="branch in branches">
                         <input type="radio"
                         :id="branch"
@@ -49,31 +49,34 @@
                 </div>
                 <div v-bind:class="classTable">
                     <p>Type de Collèges <strong>{{ currentBranch }} </strong></p>      
-                </div>
+                </div> -->
                 <p>----------</p>
             </div>
 
             <div class="row">
             <!-- utilisation des données réponses de l'API à partir de college.fields -->
 
-                <div v-if="apiLoaded" v-for="college in colleges" class="card col-sm-6 col-md-4 col-lg-3 mx-1 my-1" v-bind:class="classTable(college)" >
-                    <div class="card-header bg-light">
-                        <p>Ville de {{college.fields.acheminement}}</p>
-                        <p>({{college.fields.code_postal}})</p>
-                    </div>
-                    <div class="card-body">
-                        <mark>{{college.fields.etab_scolaire_nom}}</mark>
-                        <p>Etb {{college.fields.etab_scolaire_public}} ({{college.fields.etab_scolaire_uai}})</p>
-                        <p>Adr : {{college.fields.serv_spec }}</p>
-                        <p>{{college.fields.numero}}  {{college.fields.libelle}} {{college.fields.nom_voie}}</p>
+                <div v-if="apiLoaded" class="card-columns">
+                    <div v-for="college in colleges" class="card" v-bind:class="classTable(college)">
+                        <div class="card-header bg-light">
+                            <p>Ville de {{college.fields.acheminement}}</p>
+                            <p>({{college.fields.code_postal}})</p>
+                        </div>
+                        <div class="card-body">
+                            <mark>{{college.fields.etab_scolaire_nom}}</mark>
+                            <p>Etb {{college.fields.etab_scolaire_public}} ({{college.fields.etab_scolaire_uai}})</p>
+                            <p>Adr : {{college.fields.serv_spec }}</p>
+                            <p>{{college.fields.numero}}  {{college.fields.libelle}} {{college.fields.nom_voie}}</p>
 
 
-                    </div> 
-                    <div class="card-footer bg-secondary text-white">
-                        <!-- ?? ici faire appel API pour récupérer et intégrer carte correspondante à ces coordonnées ??-->
-                        <p>Longitude : {{college.fields.longitude }}</p>
-                        <p>Latitude : {{college.fields.latitude }}</p>
+                        </div> 
+                        <div class="card-footer bg-secondary text-white">
+                            <!-- ?? ici faire appel API pour récupérer et intégrer carte correspondante à ces coordonnées ??-->
+                            <p>Longitude : {{college.fields.longitude }}</p>
+                            <p>Latitude : {{college.fields.latitude }}</p>
+                        </div>
                     </div>
+
                 </div>
 
             <!-- fin utilisation des données -->
@@ -95,16 +98,18 @@
                 data: {
                     branches: ['public', 'prive'],
 		            currentBranch: 'public',
-                    colleges: null,
+                    colleges: [],
                     apiLoaded: false
                 },
 
                 created: function () {
                     this.fetchData()
+
                 },
 
                 watch: {
                     currentBranch: 'fetchData'
+                    
                 },
 
                 computed: {
@@ -115,25 +120,38 @@
                 methods: {
                     fetchData: function () {
                         var apiURL = "";
+
                         var self = this;
                         if (self.currentBranch == "public") {
                             apiURL = apiURLpublic;
                         } else {
                             apiURL = apiURLprive;
                         };
-    
-                        axios.get(apiURL)
-                        .then(function (response) {
-                            console.log(response.data.records)
-                            self.colleges = response.data.records
-                            self.apiLoaded = true
+                        
+                        const requete1= axios.get(apiURLpublic)
+                        const requete2 = axios.get(apiURLprive)
+                        Promise.all([requete1, requete2]).then(response => {
 
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
-                        // .finally( () => ...)
+                            console.log(response);
 
+                           self.colleges = response[0].data.records.concat(response[1].data.records)
+                           self.apiLoaded = true
+                                    //    console.log(self.colleges)
+                                    //    console.log( self.colleges[0].fields.etab_scolaire_nom)
+                                    //    console.log( self.colleges[12].fields.etab_scolaire_nom)
+                        })
+
+                                    // axios.get(apiURL)
+                                    // .then(function (response) {
+                                    //     console.log(response.data.records)
+                                    //     self.colleges = response.data.records
+                                    //     self.apiLoaded = true
+
+                                    // })
+                                    // .catch(function (error) {
+                                    //     console.log(error);
+                                    // })
+                                    // // .finally( () => ...)
                     },
 
                     classTable: function (college) {
