@@ -36,8 +36,15 @@
             <div>
                 <div>
                     <h1>COLLEGES de LOIRE-ATLANTIQUE</h1>
+                    <p>----------</p>
                 </div>
-                <!-- <div>
+
+                <div>
+                    <input type="text" v-model="searchString" placeholder="Enter your search terms" />
+                    <p>----------</p> 
+                </div>
+
+                <div>
                     <template v-for="branch in branches">
                         <input type="radio"
                         :id="branch"
@@ -47,9 +54,7 @@
                         <label :for="branch">{{ branch }}</label>
                     </template>                    
                 </div>
-                <div v-bind:class="classTable">
-                    <p>Type de Collèges <strong>{{ currentBranch }} </strong></p>      
-                </div> -->
+
                 <p>----------</p>
             </div>
 
@@ -57,7 +62,7 @@
             <!-- utilisation des données réponses de l'API à partir de college.fields -->
 
                 <div v-if="apiLoaded" class="card-columns">
-                    <div v-for="college in colleges" class="card" v-bind:class="classTable(college)">
+                    <div v-for="college in filteredColleges" class="card" v-bind:class="classTable(college)">
                         <div class="card-header bg-light">
                             <p>Ville de {{college.fields.acheminement}}</p>
                             <p>({{college.fields.code_postal}})</p>
@@ -96,10 +101,12 @@
                 el: '#corpsAPI',
 
                 data: {
-                    branches: ['public', 'prive'],
-		            currentBranch: 'public',
+                    branches: ['tous', 'public', 'privé'],
+		            currentBranch: "tous",
                     colleges: [],
-                    apiLoaded: false
+                    apiLoaded: false,
+                    searchString: ""
+
                 },
 
                 created: function () {
@@ -113,20 +120,43 @@
                 },
 
                 computed: {
+                    // A computed property that holds only those articles that match the searchString.
+                    filteredColleges: function () {
+                        var colleges_array = this.colleges, 
+                            searchString = this.searchString,
+                            currentBranch = this.currentBranch;
 
+                        if ((!searchString) && (currentBranch == "tous")){ // (luc) si pas de filtre, on affiche le tableau articles que l'on a en stock (ici en dur ou par AJAX)
+                            return colleges_array;
+                        }
+
+                        searchString = searchString.trim().toLowerCase(); // (luc) trim() enleve les caractères blancs et de repère en debut et fin de ligne
+
+                        colleges_array = colleges_array.filter(function(item){ // on applique la fonction filter au tableau articles ???? (luc)
+                        // voir MDN (luc) : https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Array/filter
+                            if(item.fields.etab_scolaire_nom.toLowerCase().indexOf(searchString) !== -1){
+                                if ((currentBranch == 'tous') || (item.fields.etab_scolaire_public == currentBranch)) {
+                                    return item;
+                                }
+                            }
+                        })
+
+                        // Return an array with the filtered data.
+                        return colleges_array;;
+        }
 
                 },
 
                 methods: {
                     fetchData: function () {
                         var apiURL = "";
-
                         var self = this;
-                        if (self.currentBranch == "public") {
-                            apiURL = apiURLpublic;
-                        } else {
-                            apiURL = apiURLprive;
-                        };
+
+                        // if (self.currentBranch == "public") {
+                        //     apiURL = apiURLpublic;
+                        // } else {
+                        //     apiURL = apiURLprive;
+                        // };
                         
                         const requete1= axios.get(apiURLpublic)
                         const requete2 = axios.get(apiURLprive)
